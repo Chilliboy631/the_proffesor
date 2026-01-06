@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAccSo: UK Market Readiness Report (Portfolio)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Professional Neutral (Slate/Indigo) -->
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9', // Sky blue
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #1e293b; /* Slate 800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .nav-item.active {
+            background-color: #e2e8f0;
+            border-left: 4px solid #0284c7;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        /* Custom scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .risk-selected {
+            border: 2px solid #0f172a !important;
+            transform: scale(0.98);
+        }
+
+        /* Print Styling */
+        @media print {
+            aside, #print-btn, #reset-btn { display: none !important; }
+            main { margin: 0; padding: 0; width: 100%; overflow: visible; }
+            .content-view { display: block !important; margin-bottom: 2rem; break-inside: avoid; }
+            body { background-color: white; }
+            .card-shadow { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row relative">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col md:h-screen md:sticky md:top-0 z-20 shadow-md md:shadow-none">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center md:block">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">TAccSo <span class="text-brand-600">UK</span></h1>
+                <p class="text-xs text-slate-500 mt-1">Market Readiness Report</p>
+            </div>
+            <div class="md:hidden text-slate-400 text-sm">(Menu)</div>
+        </div>
+        
+        <nav class="flex-1 py-4 space-y-1 overflow-y-auto">
+            <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors active">
+                📊 Executive Summary
+            </button>
+            <button onclick="navigate('terminology')" id="nav-terminology" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                🇬🇧 Terminology & Trust
+            </button>
+            <button onclick="navigate('compliance')" id="nav-compliance" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                🛡️ GDPR & Compliance
+            </button>
+            <button onclick="navigate('opportunity')" id="nav-opportunity" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                📈 MTD Opportunity (2026)
+            </button>
+            <button onclick="navigate('infrastructure')" id="nav-infrastructure" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                💳 Billing & Payments
+            </button>
+            <button onclick="navigate('action-plan')" id="nav-action-plan" class="nav-item w-full text-left px-6 py-3 text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                ✅ Checklist & Risks
+            </button>
+        </nav>
+
+        <div class="p-6 border-t border-slate-100 bg-slate-50 hidden md:block">
+            <div class="text-xs text-slate-500 font-medium mb-2">Sources Integrated:</div>
+            <ul class="text-xs text-slate-400 space-y-1">
+                <li>• HMRC Developer Hub</li>
+                <li>• ICO UK GDPR Guide</li>
+                <li>• ICAEW Glossary</li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-h-screen bg-slate-50 p-4 md:p-8 pb-20" id="main-content">
+        
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 pb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800" id="page-title">Executive Summary</h2>
+                <p class="text-slate-500 text-sm mt-1" id="page-subtitle">Assessment of TAccSo's transition from South Africa to the UK Market.</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-3 shrink-0">
+                <button id="print-btn" onclick="window.print()" class="px-3 py-1 bg-white text-slate-600 rounded-full text-xs font-semibold border border-slate-300 hover:bg-slate-50 transition-colors">🖨️ Print Report</button>
+                <button id="reset-btn" onclick="resetData()" class="px-3 py-1 bg-white text-slate-600 rounded-full text-xs font-semibold border border-slate-300 hover:bg-red-50 hover:text-red-600 transition-colors">↺ Reset Data</button>
+                <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold border border-amber-200">Draft Status</span>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="content-view space-y-6">
+            <div class="bg-white p-6 rounded-xl card-shadow border border-slate-100">
+                <p class="text-slate-700 leading-relaxed">
+                    <strong>Context:</strong> TAccSo currently operates successfully in South Africa using POPIA-compliant workflows. To launch in the UK by Q3 2026 (ahead of the MTD mandate), we must bridge significant gaps in terminology, data sovereignty, and billing infrastructure. The following report details these gaps and the path to becoming an "HMRC-Compatible" solution.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Readiness Chart Card -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-slate-100 flex flex-col relative">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Overall Readiness Score</h3>
+                    <div class="flex-1 flex items-center justify-center w-full">
+                        <div class="chart-container" style="height: 200px; max-height: 200px;">
+                            <canvas id="readinessChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <span class="text-3xl font-bold text-slate-800">42%</span>
+                        <span class="text-sm text-slate-500 block">Ready for Launch</span>
+                    </div>
+                </div>
+
+                <!-- Key Metric 1 -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-slate-100">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">The Opportunity</h3>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-bold text-brand-600">4x</span>
+                    </div>
+                    <p class="text-slate-600 mt-2">Increase in filing volume per client under <span class="font-semibold">MTD for ITSA</span> (Quarterly Updates).</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <p class="text-xs text-slate-400">Source: HMRC Official Roadmap</p>
+                    </div>
+                </div>
+
+                <!-- Key Metric 2 -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-slate-100">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Critical Risk</h3>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-bold text-red-500">Hallucination</span>
+                    </div>
+                    <p class="text-slate-600 mt-2">AI models referencing <span class="font-semibold">SARS</span> rules instead of <span class="font-semibold">HMRC</span> guidance.</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <button onclick="navigate('action-plan')" class="text-sm text-brand-600 font-medium hover:underline">View Mitigation Strategy &rarr;</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <!-- ORDERED CRITICAL PATH -->
+                 <div class="bg-white p-6 rounded-xl card-shadow border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-6">Critical Path: First Steps</h3>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-4 ring-slate-50">1</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">Legal Foundation (Week 1)</h4>
+                                <p class="text-xs text-slate-600 mt-1">Register with the <strong>ICO</strong> and pay the Data Protection Fee. This provides the legal license to process UK citizen data.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-4 ring-slate-50">2</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">Infrastructure (Week 2-3)</h4>
+                                <p class="text-xs text-slate-600 mt-1">Establish <strong>AWS London (eu-west-2)</strong> environment. Ensure strict ring-fencing from SA servers to satisfy Data Residency concerns.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-4 ring-slate-50">3</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">Product Localization (Month 1)</h4>
+                                <p class="text-xs text-slate-600 mt-1">Retrain RAG models to exclude "SARS" context. Implement <strong>HMRC API</strong> headers for 'Service Recognition'.</p>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div class="bg-gradient-to-br from-brand-900 to-slate-900 p-6 rounded-xl card-shadow text-white relative overflow-hidden flex flex-col justify-center">
+                     <div class="relative z-10">
+                        <h3 class="font-bold text-lg mb-2">Start the Tour</h3>
+                        <p class="text-slate-300 text-sm mb-6 leading-relaxed">Explore the detailed gap analysis for Terminology, Compliance, and Technical Infrastructure to understand the full scope of work.</p>
+                        <button onclick="navigate('terminology')" class="bg-white text-brand-900 px-5 py-3 rounded-lg text-sm font-bold hover:bg-brand-50 transition-colors shadow-lg w-full md:w-auto">Go to Terminology &rarr;</button>
+                     </div>
+                     <!-- Abstract Decoration -->
+                     <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-5 rounded-full"></div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- TERMINOLOGY VIEW -->
+        <div id="view-terminology" class="content-view hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-brand-500">
+                <h3 class="font-bold text-lg text-slate-800 mb-2">Why Localization Matters</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Trust is the currency of the accountancy profession. Using South African terminology (e.g., "SARS", "Provisional Tax") with a UK client signals incompetence or a scam. The AI must be retrained to speak "HMRC".
+                </p>
+            </div>
+
+            <h3 class="text-md font-semibold text-slate-500 uppercase tracking-wide mt-8 mb-4">The Translation Layer: SA to UK (Static Examples)</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="term-grid">
+                <!-- Terms injected via JS with Dynamic Height -->
+            </div>
+            
+            <div class="bg-slate-100 p-4 rounded-lg mt-6 text-xs text-slate-500 text-center">
+                Source: ICAEW Professional Glossary & HMRC Developer Hub
+            </div>
+        </div>
+
+        <!-- COMPLIANCE VIEW -->
+        <div id="view-compliance" class="content-view hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-emerald-500">
+                <h3 class="font-bold text-lg text-slate-800 mb-2">Building the Trust Framework</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Moving from POPIA to UK GDPR is not just a "Search and Replace". The legal basis for processing financial data changes, and the penalties for non-compliance are severe (up to £17.5m). We must establish a "Data Fortress" in the UK.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+                <!-- Left: Compliance Timeline -->
+                <div class="bg-white p-6 rounded-xl card-shadow">
+                    <h4 class="font-bold text-slate-800 mb-6 border-b pb-2">Mandatory Legal Setup</h4>
+                    <div class="space-y-8 relative pl-4">
+                        <!-- Vertical Line -->
+                        <div class="absolute left-0 top-2 bottom-2 w-0.5 bg-slate-200"></div>
+
+                        <!-- Item 1 -->
+                        <div class="relative pl-6">
+                            <div class="absolute left-[-5px] top-1 w-3 h-3 bg-brand-500 rounded-full border-2 border-white"></div>
+                            <h5 class="font-semibold text-slate-800 text-sm">1. ICO Registration</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Every UK business processing personal data must pay the Data Protection Fee to the Information Commissioner's Office (ICO). <br><span class="text-brand-600 font-semibold">Cost: ~£40-£60/year for startups.</span></p>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="relative pl-6">
+                            <div class="absolute left-[-5px] top-1 w-3 h-3 bg-slate-300 rounded-full border-2 border-white"></div>
+                            <h5 class="font-semibold text-slate-800 text-sm">2. UK GDPR & DPA 2018</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Draft a UK-specific Data Processing Agreement (DPA). POPIA compliance is insufficient. Explicit consent mechanisms required for marketing.</p>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="relative pl-6">
+                            <div class="absolute left-[-5px] top-1 w-3 h-3 bg-slate-300 rounded-full border-2 border-white"></div>
+                            <h5 class="font-semibold text-slate-800 text-sm">3. Appoint UK Rep (Article 27)</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Since TAccSo is non-UK based initially, we may need a designated Article 27 Representative in the UK for GDPR queries.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Data Residency Visual -->
+                <div class="bg-white p-6 rounded-xl card-shadow flex flex-col">
+                    <h4 class="font-bold text-slate-800 mb-4 border-b pb-2">Data Sovereignty</h4>
+                    <div class="flex-1 bg-slate-50 rounded-lg p-6 flex flex-col justify-center items-center text-center">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="p-4 bg-slate-200 rounded text-slate-400">
+                                <div class="font-bold text-xs">Johannesburg</div>
+                                <div class="text-[10px]">af-south-1</div>
+                            </div>
+                            <div class="text-slate-400">➔</div>
+                            <div class="p-4 bg-brand-100 border border-brand-200 rounded text-brand-800 shadow-sm">
+                                <div class="font-bold text-xs">London</div>
+                                <div class="text-[10px]">eu-west-2</div>
+                                <div class="mt-1 text-[9px] bg-brand-200 px-1 rounded text-brand-900">Recommended</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            While GDPR allows data transfer to "Adequate" countries, UK accountants perceive <strong>UK Hosting (AWS London)</strong> as a non-negotiable security standard.
+                        </p>
+                    </div>
+                    <div class="mt-4 p-3 bg-amber-50 border border-amber-100 rounded text-xs text-amber-800">
+                        <strong>Strategic Note:</strong> Hosting in London reduces latency and eliminates "Data Sovereignty" objections during sales calls.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPPORTUNITY VIEW -->
+        <div id="view-opportunity" class="content-view hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-indigo-500">
+                <h3 class="font-bold text-lg text-slate-800 mb-2">The 2026 "Event Horizon"</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    In April 2026, <strong>Making Tax Digital (MTD) for ITSA</strong> mandates quarterly digital reporting for landlords and sole traders earning >£50k. This shifts the market from "Once a year shoe-box" to "Always-on digital".
+                </p>
+            </div>
+
+            <!-- Value Analysis Section -->
+            <div class="bg-slate-900 text-white p-6 rounded-xl card-shadow">
+                <h3 class="font-bold text-lg mb-4 text-brand-400">Strategic Value Thesis: The "Why & How"</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Column 1: The Problem -->
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xl">🔥</span>
+                            <h4 class="font-bold text-sm">The "Capacity Crisis"</h4>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            <strong>Why:</strong> MTD quadruples the filing workload (from 1 to 4+ updates/year). Accountants cannot hire 4x the staff to handle this, nor can they charge clients 4x the fees.
+                        </p>
+                        <div class="mt-3 p-2 bg-red-900/30 border border-red-500/30 rounded text-xs text-red-200">
+                            <strong>Result:</strong> Firms are desperate for automation to avoid firing small clients.
+                        </div>
+                    </div>
+
+                    <!-- Column 2: The Solution -->
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xl">🤖</span>
+                            <h4 class="font-bold text-sm">TAccSo's Role</h4>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            <strong>How:</strong> TAccSo's RAG AI ingests raw bank feeds and receipts, automatically drafting the 4 quarterly updates. We don't just "help" the accountant; we do the "low-value" work entirely.
+                        </p>
+                        <div class="mt-3 p-2 bg-blue-900/30 border border-blue-500/30 rounded text-xs text-blue-200">
+                            <strong>Result:</strong> The accountant retains the client relationship but removes the manual labor.
+                        </div>
+                    </div>
+
+                    <!-- Column 3: The Economic Upside -->
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xl">💷</span>
+                            <h4 class="font-bold text-sm">Revenue Quality</h4>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            <strong>Value:</strong> This forces a shift from annual billing to <strong>Monthly Recurring Revenue (MRR)</strong>. Compliance is non-discretionary (mandated by law), creating near-zero churn.
+                        </p>
+                        <div class="mt-3 p-2 bg-green-900/30 border border-green-500/30 rounded text-xs text-green-200">
+                            <strong>Result:</strong> High-margin, sticky SaaS revenue tied to government mandates.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat Analysis Section -->
+            <div class="bg-white p-6 rounded-xl card-shadow">
+                <h4 class="font-bold text-slate-800 mb-6 border-b pb-2">Threat Matrix: Competitive Landscape</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Threat 1: The Incumbents -->
+                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-bold text-sm text-slate-700">The "Big 3"</h5>
+                            <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">High Threat</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-600 mb-2">Xero, Sage, QuickBooks</p>
+                        <ul class="text-xs text-slate-500 space-y-1 mb-3">
+                            <li>• 80%+ Market Share</li>
+                            <li>• Deep bank feed integration</li>
+                            <li>• Extensive app marketplaces</li>
+                        </ul>
+                        <div class="text-[10px] p-2 bg-white rounded border border-slate-200">
+                            <strong>Weakness:</strong> Expensive for simple landlords. Feature bloat makes them complex for non-business owners.
+                        </div>
+                    </div>
+
+                    <!-- Threat 2: Legacy Tax Soft -->
+                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-bold text-sm text-slate-700">Legacy Tax</h5>
+                            <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded font-bold">Med Threat</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-600 mb-2">TaxCalc, BTCSoftware</p>
+                        <ul class="text-xs text-slate-500 space-y-1 mb-3">
+                            <li>• Trusted by traditional accountants</li>
+                            <li>• Rock-solid compliance</li>
+                            <li>• Low price point</li>
+                        </ul>
+                        <div class="text-[10px] p-2 bg-white rounded border border-slate-200">
+                            <strong>Weakness:</strong> Desktop-first heritage. Very poor AI/Automation capabilities. Purely for "filing", not "doing".
+                        </div>
+                    </div>
+
+                    <!-- Threat 3: Challenger Banks -->
+                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-bold text-sm text-slate-700">Challenger Banks</h5>
+                            <span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold">Low Threat</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-600 mb-2">Monzo, Starling, Mettle</p>
+                        <ul class="text-xs text-slate-500 space-y-1 mb-3">
+                            <li>• Free "Tax Pots" & simple tools</li>
+                            <li>• Zero-friction user experience</li>
+                            <li>• Already hold the transaction data</li>
+                        </ul>
+                        <div class="text-[10px] p-2 bg-white rounded border border-slate-200">
+                            <strong>Weakness:</strong> No "Agent View". Accountants hate them because they bypass the professional workflow.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategic Recommendations -->
+            <div class="bg-gradient-to-r from-brand-600 to-brand-800 text-white p-6 rounded-xl card-shadow">
+                <h4 class="font-bold text-lg mb-4">Recommendations: Gaining the Market Edge</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Edge 1 -->
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20 hover:bg-white/20 transition-colors">
+                        <div class="text-2xl mb-2">🏙️</div>
+                        <h5 class="font-bold text-sm mb-1">Verticalize: The "Landlord Edition"</h5>
+                        <p class="text-xs text-brand-50 leading-relaxed">
+                            Don't fight Xero on general business. Focus 100% on the <strong>Landlord Niche</strong>. They have the highest volume of MTD filings but the simplest needs. Build the "lite" tool Xero refuses to build.
+                        </p>
+                    </div>
+
+                    <!-- Edge 2 -->
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20 hover:bg-white/20 transition-colors">
+                        <div class="text-2xl mb-2">🇿🇦</div>
+                        <h5 class="font-bold text-sm mb-1">Leverage SA Cost Base</h5>
+                        <p class="text-xs text-brand-50 leading-relaxed">
+                            Use the strong Rand/Pound exchange rate to offer <strong>"Concierge Onboarding"</strong>. Use SA staff to manually help UK accountants migrate data. Competitors cannot afford this human touch.
+                        </p>
+                    </div>
+
+                    <!-- Edge 3 -->
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20 hover:bg-white/20 transition-colors">
+                        <div class="text-2xl mb-2">🔍</div>
+                        <h5 class="font-bold text-sm mb-1">"Auditable AI" Trust</h5>
+                        <p class="text-xs text-brand-50 leading-relaxed">
+                            Competitors treat AI as a "Black Box". Win trust by making TAccSo <strong>"Glass Box"</strong>—every AI-generated tax figure must hyperlink directly to the source invoice image.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFRASTRUCTURE VIEW -->
+        <div id="view-infrastructure" class="content-view hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-slate-500">
+                <h3 class="font-bold text-lg text-slate-800 mb-2">Getting Paid in Pounds</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    The UK has strict requirements for VAT invoices and a distinct preference for Direct Debit (BACS) over credit cards for B2B professional services.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- VAT Invoice Requirements -->
+                <div class="bg-white p-6 rounded-xl card-shadow">
+                    <h4 class="font-bold text-slate-800 mb-4">UK VAT Invoice Requirements</h4>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">✓</span> Unique Invoice Number (Sequential)
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">✓</span> Seller's Name & Address
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">✓</span> <strong>VAT Registration Number</strong> (Critical)
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">✓</span> Tax Date (Time of Supply)
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">✓</span> Rate of VAT applied per item (Standard is 20%)
+                        </li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-red-50 text-red-700 text-xs rounded border border-red-100">
+                        <strong>Gap:</strong> Current SA system generates "Tax Invoices" with 15% VAT logic. Needs hard fork for UK logic.
+                    </div>
+                </div>
+
+                <!-- Payment Rails -->
+                <div class="bg-white p-6 rounded-xl card-shadow">
+                    <h4 class="font-bold text-slate-800 mb-4">Payment Rails Strategy</h4>
+                    <div class="space-y-4">
+                        <div class="p-3 border rounded-lg bg-slate-50">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-sm">Direct Debit (BACS)</span>
+                                <span class="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold">Standard</span>
+                            </div>
+                            <p class="text-xs text-slate-500">The "Gold Standard" for accountants. Low churn, low fees. Provider: GoCardless.</p>
+                        </div>
+                        <div class="p-3 border rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-sm">Credit Card (Visa/MC)</span>
+                                <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full">Secondary</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Used for smaller SaaS subs, but higher failure rates and fees (Interchange).</p>
+                        </div>
+                        <div class="p-3 border rounded-lg opacity-60">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-sm">EFT / Bank Transfer</span>
+                                <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full">Avoid</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Manual reconciliation nightmare. Only for enterprise contracts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION PLAN VIEW -->
+        <div id="view-action-plan" class="content-view hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-red-500">
+                <h3 class="font-bold text-lg text-slate-800 mb-2">Implementation & Risk Control</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    A prioritized roadmap to launch, coupled with a heat-map of strategic risks. The "Compliance Hallucination" risk is our highest severity item.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Interactive Checklist -->
+                <div class="bg-white p-6 rounded-xl card-shadow flex flex-col md:h-[600px] min-h-[500px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-slate-800">Launch Checklist</h4>
+                        <span id="progress-text" class="text-xs font-semibold text-brand-600">0% Complete</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-200 rounded-full h-2 mb-6 shrink-0">
+                        <div id="progress-bar" class="bg-brand-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="overflow-y-auto custom-scroll flex-1 space-y-2 pr-2" id="checklist-container">
+                        <!-- Checklist items generated by JS -->
+                    </div>
+                </div>
+
+                <!-- UPDATED: Risk Matrix & Detailed Strategy Card -->
+                <div class="flex flex-col gap-6 md:h-[600px]">
+                    <!-- 1. Risk Matrix (Top Half) -->
+                    <div class="bg-white p-4 rounded-xl card-shadow flex-shrink-0">
+                        <h4 class="font-bold text-slate-800 mb-2">Risk Heatmap</h4>
+                        <p class="text-xs text-slate-500 mb-3">Select a risk zone to view mitigation strategy.</p>
+                        
+                        <div class="grid grid-rows-2 grid-cols-2 gap-1 border border-slate-200 bg-slate-200 h-48">
+                            <!-- Top Left: Market Delay -->
+                            <div id="risk-zone-market-delay" class="bg-amber-50 p-2 relative hover:bg-amber-100 transition-all cursor-pointer group" onclick="showRisk('market-delay')">
+                                <span class="text-[9px] font-bold text-amber-800 uppercase absolute top-1 left-2 opacity-60">Imp: High | Prob: Low</span>
+                                <div class="flex items-center justify-center h-full">
+                                    <span class="text-xs font-semibold text-slate-700 text-center group-hover:scale-105 transition-transform">Market Delay<br>(MTD Postponed)</span>
+                                </div>
+                            </div>
+
+                            <!-- Top Right: Hallucination -->
+                            <div id="risk-zone-hallucination" class="bg-red-100 p-2 relative hover:bg-red-200 transition-all cursor-pointer group" onclick="showRisk('hallucination')">
+                                 <span class="text-[9px] font-bold text-red-800 uppercase absolute top-1 left-2 opacity-60">Imp: Critical | Prob: High</span>
+                                 <div class="flex items-center justify-center h-full">
+                                    <span class="text-xs font-bold text-red-900 text-center group-hover:scale-105 transition-transform">Compliance<br>Hallucination</span>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Left: Currency -->
+                            <div id="risk-zone-currency" class="bg-green-50 p-2 relative hover:bg-green-100 transition-all cursor-pointer group" onclick="showRisk('currency')">
+                                 <span class="text-[9px] font-bold text-green-800 uppercase absolute top-1 left-2 opacity-60">Imp: Low | Prob: Low</span>
+                                 <div class="flex items-center justify-center h-full">
+                                    <span class="text-xs font-semibold text-slate-700 text-center group-hover:scale-105 transition-transform">Currency<br>Fluctuation</span>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Right: Competitor -->
+                            <div id="risk-zone-competitor" class="bg-yellow-50 p-2 relative hover:bg-yellow-100 transition-all cursor-pointer group" onclick="showRisk('competitor')">
+                                 <span class="text-[9px] font-bold text-yellow-800 uppercase absolute top-1 left-2 opacity-60">Imp: Med | Prob: High</span>
+                                 <div class="flex items-center justify-center h-full">
+                                    <span class="text-xs font-semibold text-slate-700 text-center group-hover:scale-105 transition-transform">Competitor<br>Crowding</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2. Mitigation Strategy Card (Bottom Half) -->
+                    <div id="mitigation-card" class="bg-white p-6 rounded-xl card-shadow flex-1 border-l-4 border-slate-300 transition-colors flex flex-col justify-center items-center text-center">
+                        <!-- Default State -->
+                        <div class="text-slate-400">
+                            <div class="text-3xl mb-2">👈</div>
+                            <p class="text-sm">Click a risk zone above to reveal the detailed mitigation plan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA & STATE ---
+        const terminologyData = [
+            { sa: "SARS (South African Revenue Service)", uk: "HMRC (HM Revenue & Customs)", desc: "The tax authority. AI must never mention SARS in UK docs." },
+            { sa: "POPIA (Protection of Personal Info Act)", uk: "UK GDPR / DPA 2018", desc: "Similar principles, but UK GDPR has specific data sovereignty and reporting rules." },
+            { sa: "Tax Practitioner", uk: "Tax Agent", desc: "The professional designation. 'Practitioner' is understood but 'Agent' is the legal term for API access." },
+            { sa: "ITR12 (Individual Return)", uk: "SA100 (Self Assessment)", desc: "The core individual tax form. MTD replaces this with quarterly updates." },
+            { sa: "Provisional Tax", uk: "Payments on Account", desc: "Advance payments towards your tax bill. Mechanics differ significantly." },
+            { sa: "Company Registration (CIPC)", uk: "Companies House", desc: "The registrar of companies. A key data source for verification." }
+        ];
+
+        // Default Data
+        const defaultChecklistData = [
+            { id: 1, text: "Register with ICO (Data Protection Fee)", cat: "Legal", checked: false },
+            { id: 2, text: "Sign UK Data Processing Agreement (DPA)", cat: "Legal", checked: false },
+            { id: 3, text: "Set up AWS London Region (eu-west-2)", cat: "Tech", checked: false },
+            { id: 4, text: "Register for HMRC Developer Account", cat: "Tech", checked: false },
+            { id: 5, text: "Retrain RAG Model on UK Tax Law (Remove SA Context)", cat: "AI", checked: false },
+            { id: 6, text: "Implement VAT Invoice Logic (20% Standard)", cat: "Billing", checked: false },
+            { id: 7, text: "Integrate GoCardless for Direct Debit", cat: "Billing", checked: false },
+            { id: 8, text: "Obtain 'HMRC Recognised' Status", cat: "Launch", checked: false }
+        ];
+
+        // Load from LocalStorage or use default
+        let checklistData = JSON.parse(localStorage.getItem('taccso_checklist')) || defaultChecklistData;
+
+        const risks = {
+            'hallucination': {
+                title: "Compliance Hallucination",
+                severity: "Critical",
+                borderColor: "border-red-500",
+                badgeColor: "bg-red-100 text-red-800",
+                desc: "AI models referencing SARS (South African) rules instead of HMRC guidance. This is the fastest way to lose license and reputation.",
+                mitigation: [
+                    "<strong>Strict RAG Filtering:</strong> Hard-block all SA vectors when user context is 'UK'.",
+                    "<strong>Citation Enforcement:</strong> AI must provide a link to a valid <em>gov.uk</em> page for every tax claim.",
+                    "<strong>Human-in-the-Loop:</strong> Mandatory manual review for the first 1,000 filings."
+                ]
+            },
+            'market-delay': {
+                title: "Market Delay (MTD Postponed)",
+                severity: "High Impact",
+                borderColor: "border-amber-500",
+                badgeColor: "bg-amber-100 text-amber-800",
+                desc: "HMRC has delayed MTD before. If 2026 is pushed to 2028, our primary growth driver stalls.",
+                mitigation: [
+                    "<strong>Flexible Roadmap:</strong> Prioritize 'Practice Management' features (document signing, email automation) that add value <em>now</em>.",
+                    "<strong>Burn Rate Control:</strong> Keep UK headcount lean until mandate is confirmed.",
+                    "<strong>Legacy Support:</strong> Build a simple SA100 adapter to serve the current market."
+                ]
+            },
+            'currency': {
+                title: "Currency Fluctuation (ZAR/GBP)",
+                severity: "Low Impact",
+                borderColor: "border-green-500",
+                badgeColor: "bg-green-100 text-green-800",
+                desc: "Volatility between the Rand and Pound could impact profit margins if not managed.",
+                mitigation: [
+                    "<strong>Natural Hedge:</strong> Price in GBP. Hold funds in UK entity. Only repatriate to SA for operational costs as needed.",
+                    "<strong>Pricing Power:</strong> Our cost base is in ZAR, so we can absorb minor fluctuations while still undercutting UK rivals.",
+                ]
+            },
+            'competitor': {
+                title: "Competitor Crowding",
+                severity: "Medium Impact",
+                borderColor: "border-yellow-500",
+                badgeColor: "bg-yellow-100 text-yellow-800",
+                desc: "Xero or Sage might release a free 'MTD Lite' tool, crushing independent software vendors.",
+                mitigation: [
+                    "<strong>Niche Down:</strong> Focus specifically on 'Migrant Accountants' or 'High-Volume Landlords' ignored by the giants.",
+                    "<strong>Concierge Service:</strong> Use SA staff to offer manual onboarding support that Xero cannot automate.",
+                    "<strong>Integrate, Don't Fight:</strong> Build connectors to Xero so we can be a plugin rather than a replacement."
+                ]
+            }
+        };
+
+        // --- NAVIGATION LOGIC ---
+        function navigate(viewId) {
+            // Hide all views
+            document.querySelectorAll('.content-view').forEach(el => el.classList.add('hidden'));
+            // Show selected view
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Update Nav State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-slate-50', 'border-l-4', 'border-brand-600', 'font-semibold', 'text-slate-900'));
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if(activeNav) activeNav.classList.add('active');
+
+            // Update Header Titles
+            const titles = {
+                'dashboard': ['Executive Summary', 'Assessment of TAccSo\'s transition from South Africa to the UK Market.'],
+                'terminology': ['Terminology & Localization', 'Mapping South African concepts to the British Context.'],
+                'compliance': ['Compliance Framework', 'Navigating UK GDPR, ICO, and Data Sovereignty.'],
+                'opportunity': ['The MTD Opportunity', 'Capitalizing on the 2026 Making Tax Digital Mandate.'],
+                'infrastructure': ['Billing & Infrastructure', 'Professional Standards for Payments and Invoicing.'],
+                'action-plan': ['Action Plan & Risks', 'Implementation Checklist and Strategic Risk Map.']
+            };
+            document.getElementById('page-title').innerText = titles[viewId][0];
+            document.getElementById('page-subtitle').innerText = titles[viewId][1];
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderTerminology() {
+            const container = document.getElementById('term-grid');
+            if(container) {
+                container.innerHTML = terminologyData.map(item => `
+                    <div class="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative min-h-[8rem] grid grid-cols-1 grid-rows-1">
+                        <div class="col-start-1 row-start-1 p-6 flex flex-col justify-between transition-opacity duration-300 group-hover:opacity-0 bg-white z-10">
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">South Africa (Current)</span>
+                                <div class="text-xl font-bold text-slate-800 mt-1">${item.sa}</div>
+                            </div>
+                            <div class="text-xs text-brand-600 font-medium">Hover to Translate &rarr;</div>
+                        </div>
+                        <div class="col-start-1 row-start-1 p-6 flex flex-col justify-between bg-brand-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                            <div>
+                                <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">United Kingdom (Target)</span>
+                                <div class="text-xl font-bold text-brand-900 mt-1">${item.uk}</div>
+                            </div>
+                            <div class="text-xs text-slate-600 leading-tight mt-2">${item.desc}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            if(container) {
+                container.innerHTML = checklistData.map(item => `
+                    <div class="flex items-center p-3 bg-slate-50 rounded border border-slate-200 hover:bg-white transition-colors">
+                        <input type="checkbox" id="check-${item.id}" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${item.id})" class="w-5 h-5 text-brand-600 rounded border-slate-300 focus:ring-brand-500 cursor-pointer">
+                        <div class="ml-3">
+                            <label for="check-${item.id}" class="text-sm font-medium text-slate-700 cursor-pointer ${item.checked ? 'line-through text-slate-400' : ''}">${item.text}</label>
+                            <span class="text-[10px] ml-2 px-2 py-0.5 bg-slate-200 rounded-full text-slate-600">${item.cat}</span>
+                        </div>
+                    </div>
+                `).join('');
+                updateProgress();
+            }
+        }
+
+        function toggleCheck(id) {
+            const item = checklistData.find(i => i.id === id);
+            item.checked = !item.checked;
+            
+            // Save to LocalStorage
+            localStorage.setItem('taccso_checklist', JSON.stringify(checklistData));
+            
+            renderChecklist();
+        }
+
+        function resetData() {
+            if(confirm("Reset all checklist data?")) {
+                localStorage.removeItem('taccso_checklist');
+                checklistData = JSON.parse(JSON.stringify(defaultChecklistData)); // Deep copy reset
+                renderChecklist();
+                navigate('dashboard');
+            }
+        }
+
+        function updateProgress() {
+            const total = checklistData.length;
+            const checked = checklistData.filter(i => i.checked).length;
+            const pct = Math.round((checked / total) * 100);
+            
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${pct}% Complete`;
+            
+            const bar = document.getElementById('progress-bar');
+            if(pct < 30) bar.className = "bg-red-500 h-2 rounded-full transition-all duration-500";
+            else if (pct < 70) bar.className = "bg-amber-500 h-2 rounded-full transition-all duration-500";
+            else bar.className = "bg-green-500 h-2 rounded-full transition-all duration-500";
+        }
+
+        // IMPROVED: showRisk function renders a full card
+        function showRisk(riskId) {
+            const risk = risks[riskId];
+            const card = document.getElementById('mitigation-card');
+            
+            // Visual selection state
+            document.querySelectorAll('[id^="risk-zone-"]').forEach(el => el.classList.remove('risk-selected'));
+            document.getElementById(`risk-zone-${riskId}`).classList.add('risk-selected');
+
+            // Render Card Content
+            card.className = `bg-white p-6 rounded-xl card-shadow flex-1 border-l-4 ${risk.borderColor} transition-colors flex flex-col items-start text-left overflow-y-auto`;
+            
+            const stepsHtml = risk.mitigation.map(step => `
+                <li class="flex items-start gap-2 text-sm text-slate-700 mb-2">
+                    <span class="text-brand-500 mt-1">➤</span>
+                    <span>${step}</span>
+                </li>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start w-full mb-3">
+                    <h5 class="font-bold text-lg text-slate-800">${risk.title}</h5>
+                    <span class="text-xs font-bold px-2 py-1 rounded ${risk.badgeColor}">${risk.severity}</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded border border-slate-100 italic">
+                    "${risk.desc}"
+                </p>
+                <div class="w-full">
+                    <h6 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Mitigation Strategy</h6>
+                    <ul class="w-full">
+                        ${stepsHtml}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // --- CHARTS ---
+
+        function initCharts() {
+            // 1. Readiness Chart
+            const ctxReadiness = document.getElementById('readinessChart');
+            if(ctxReadiness) {
+                new Chart(ctxReadiness.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ready', 'Gap'],
+                        datasets: [{
+                            data: [42, 58],
+                            backgroundColor: ['#0284c7', '#e2e8f0'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
+                    }
+                });
+            }
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            renderTerminology();
+            renderChecklist();
+            navigate('dashboard');
+        });
+
+    </script>
+</body>
+</html>
